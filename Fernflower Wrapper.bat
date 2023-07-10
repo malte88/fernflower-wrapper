@@ -1,8 +1,10 @@
 @echo off
+if not exist "./bin" mkdir "./bin"
+if not exist "./in" mkdir "./in"
 if not exist "./out" mkdir "./out"
-if not exist "./apache-maven-3.8.8" goto :dlMaven
+if not exist "./bin/apache-maven-3.8.8" goto :dlMaven
 :haveMaven
-if not exist "./fernflower.jar" goto :download
+if not exist "./bin/fernflower.jar" goto :download
 
 :askdownload
 set /p shouldDownload=Fernflower already found. Want to redownload? (y/N) 
@@ -18,7 +20,7 @@ goto :decompile
 :dlMaven
 echo Downloading Maven 3.8.8
 powershell Invoke-WebRequest https://dlcdn.apache.org/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.zip -OutFile maven.zip
-powershell Expand-Archive maven.zip -DestinationPath .
+powershell Expand-Archive maven.zip -DestinationPath ./bin/
 del maven.zip
 echo Finished downloading Maven.
 pause
@@ -27,8 +29,8 @@ goto :haveMaven
 
 :download
 echo Downloading latest Fernflower.
-call "./apache-maven-3.8.8/bin/mvn.cmd" dependency:get -DrepoUrl=https://www.jetbrains.com/intellij-repository/releases/ -Dartifact=com.jetbrains.intellij.java:java-decompiler-engine:LATEST -Ddest=./fernflower.jar
-if not exist "./fernflower.jar" (
+call "./bin/apache-maven-3.8.8/bin/mvn.cmd" dependency:get -DrepoUrl=https://www.jetbrains.com/intellij-repository/releases/ -Dartifact=com.jetbrains.intellij.java:java-decompiler-engine:LATEST -Ddest=./bin/fernflower.jar
+if not exist "./bin/fernflower.jar" (
   echo Failed to download Fernflower
   pause
   exit
@@ -38,9 +40,9 @@ pause
 
 :decompile
 cls
-if not exist "./fernflower.jar" (
+if not exist "./bin/fernflower.jar" (
   echo Failed to download Fernflower.
 )
-set /p file=Enter full Filename to decompile: 
-java -jar fernflower.jar ./%file% ./out
+set /p file=Put files in the "./in" folder and enter the Name to start decompilation: 
+java -jar ./bin/fernflower.jar ./in/%file% ./out
 pause
